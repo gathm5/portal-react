@@ -1,0 +1,153 @@
+{
+	"session": {
+		"expiration": 1800000
+	},
+	"storage": {
+		"prefix": "attkme."
+	},
+	"backend": {
+		"localhost": false,
+		"underDevelopment": true,
+		"forceFiles": false,
+		"endpointSuffix": ".json",
+		"useAlternateEndpoint": false,
+		"alternateEndpoint": "http://localhost:8000",
+		"endpoint": "",
+		"header": {
+			"name": "X-ACCESS-TOKEN"
+		},
+		"timeout": 20000,
+		"cacheTimeout": 600000,
+		"authenticate": "/authenticate",
+		"api": "/api",
+		"devApi": "/fakeApi",
+		"preAuth": {
+			"authenticate": {
+				"endpoint": "/authenticate",
+				"method": "post",
+				"cache": false
+			}
+		},
+		"postAuth": {
+			"batches": {
+				"isDev": false,
+				"method": "get",
+				"cache": true,
+				"endpoint": "/batches"
+			},
+			"batchDetails": {
+				"isDev": false,
+				"method": "get",
+				"cache": true,
+				"endpoint": "/batch-detail?batchId=:batchId",
+				"param": ":batchId"
+			},
+			"batchDevices": {
+				"isDev": false,
+				"method": "get",
+				"cache": true,
+				"endpoint": "/all-devices-batch?batchId=:batchId&customerId=:customerId",
+				"param": [
+					":batchId",
+					":customerId"
+				]
+			},
+			"transactions": {
+				"isDev": false,
+				"method": "get",
+				"cache": true,
+				"endpoint": "/transactions?transactionId=:transactionId",
+				"param": ":transactionId"
+			},
+			"devices": {
+				"isDev": false,
+				"method": "get",
+				"cache": true,
+				"endpoint": "/devices?transactionId=:transactionId",
+				"param": ":transactionId"
+			},
+			"customers": {
+				"isDev": false,
+				"method": "get",
+				"cache": true,
+				"endpoint": "/customers?customerId=:customerId",
+				"param": ":customerId"
+			},
+			"customerDetails": {
+				"isDev": false,
+				"method": "get",
+				"cache": true,
+				"endpoint": "/all-devices?customerId=:customerId",
+				"param": ":customerId"
+			},
+			"bulkAdd": {
+				"isDev": false,
+				"method": "post",
+				"cache": false,
+				"endpoint": "/bulkAdd",
+				"refresh": true
+			},
+			"bulkDelete": {
+				"isDev": false,
+				"method": "post",
+				"cache": false,
+				"endpoint": "/bulkDelete",
+				"refresh": true
+			},
+			"deleteDevice": {
+				"isDev": false,
+				"method": "post",
+				"cache": false,
+				"endpoint": "/device/delete",
+				"refresh": true
+			},
+			"returnedDevice": {
+				"isDev": false,
+				"method": "post",
+				"cache": false,
+				"endpoint": "/device/return",
+				"refresh": true
+			},
+			"deleteTransaction": {
+				"isDev": false,
+				"method": "post",
+				"cache": false,
+				"endpoint": "/transaction/delete",
+				"refresh": true
+			},
+			"generateReport": {
+				"isDev": false,
+				"method": "get",
+				"cache": false,
+				"endpoint": "/download-report?start=:start&end=:end",
+				"refresh": false,
+				"param": [
+					":start",
+					":end"
+				]
+			}
+		}
+	},
+	"pagination": {
+		"pageSizes": [
+			10,
+			20,
+			50,
+			100
+		],
+		"defaultPageSize": 50,
+		"minPageDisplay": 10
+	},
+	"dateFormat": "YYYY-MM-DD h:mm a",
+	"table": {
+		"batches": {
+			"defaultSort": "submitted"
+		},
+		"transactions": {
+			"defaultSort": "submitted"
+		}
+	},
+	"loader": {
+		"size": 75
+	}
+}

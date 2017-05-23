@@ -1,7 +1,31 @@
 const Lang = {
-	"title": "Knox Mobile Enrollment for AT&T",
-	"header": {},
+	"title": "AT&T Portal for Knox Mobile Enrollment",
+	"header": {
+		"links": {
+			"admin": "Manage Admins",
+			"logout": "Logout"
+		}
+	},
 	"headerSecondary": {
+		"dropdown": {
+			"options": [
+				"Transaction ID",
+				"Customer ID"
+			],
+			"defaultOption": "Transaction ID"
+		},
+		"buttons": {
+			"reporting": "Download report",
+			"delete": "Bulk delete",
+			"new": "Submit new devices"
+		}
+	},
+	"login": {
+		"forgot": "Forgot password?",
+		"signIn": "Sign in",
+		"processing": "Logging in..."
+	},
+	"search": {
 		"dropdown": {
 			"options": [
 				"Transaction ID",
@@ -10,35 +34,168 @@ const Lang = {
 			"defaultOption": "Transaction ID"
 		}
 	},
-	"dashboard": {
+	"batches": {
 		"title": "Recent History",
 		"table": {
 			"title": "Recent History",
 			"previous": "Previous",
 			"next": "Next"
+		},
+		"info": {
+			"field1": "Batch ID",
+			"field2": "Batch Type",
+			"field3": "Batch Status",
+			"field4": "Submitted"
+		}
+	},
+	"batch details": {
+		"title": "Batch Details",
+		"back": "Return to dashboard",
+		"modal": {
+			"confirmation": {
+				"delete": {
+					"title": "Delete device?",
+					"subtitle": "This device will be deleted from the Knox Mobile Enrollment system.",
+					"key": "IMEI",
+					"buttons": {
+						"cancel": "Cancel",
+						"ok": "Delete"
+					}
+				},
+				"returned": {
+					"title": "Return device?",
+					"subtitle": "This device will be marked as returned in the Knox Mobile Enrollment system.",
+					"key": "IMEI",
+					"buttons": {
+						"cancel": "Cancel",
+						"ok": "Return"
+					}
+				}
+			}
+		},
+		"info": {
+			"field1": "Batch ID",
+			"field2": "Customer ID",
+			"field3": "Devices",
+			"field4": "Transaction ID(s)",
+			"field5": "Submitted",
+			"field6": "Errors"
 		}
 	},
 	"transactions": {
 		"table": {
-			"title": "All Transactions",
+			"title": "Search by Transaction ID",
 			"previous": "Previous",
 			"next": "Next"
+		},
+		"back": "Return to dashboard",
+		"modal": {
+			"confirmation": {
+				"title": "Delete Transaction?",
+				"subtitle": "All devices associated with this transaction will be deleted.",
+				"key": "Transaction ID",
+				"buttons": {
+					"cancel": "Cancel",
+					"ok": "Delete"
+				}
+			}
+		},
+		"resultCount": "results"
+	},
+	"transaction details": {
+		"title": "Transaction Details",
+		"back": "Return to search results",
+		"modal": {
+			"confirmation": {
+				"delete": {
+					"title": "Delete device?",
+					"subtitle": "This device will be deleted from the Knox Mobile Enrollment system.",
+					"key": "IMEI",
+					"buttons": {
+						"cancel": "Cancel",
+						"ok": "Delete"
+					}
+				},
+				"returned": {
+					"title": "Return device?",
+					"subtitle": "This device will be marked as returned in the Knox Mobile Enrollment system.",
+					"key": "IMEI",
+					"buttons": {
+						"cancel": "Cancel",
+						"ok": "Return"
+					}
+				}
+			}
+		},
+		"info": {
+			"field1": "Transaction ID",
+			"field2": "Customer ID",
+			"field3": "Devices",
+			"field4": "Batch ID",
+			"field5": "Submitted",
+			"field6": "Errors"
 		}
 	},
-	"devices": {
-		"title": "Transaction Status"
+	"customers": {
+		"table": {
+			"title": "Search by Customer ID",
+			"previous": "Previous",
+			"next": "Next"
+		},
+		"back": "Return to dashboard",
+		"resultCount": "results"
+	},
+	"customer details": {
+		"title": "Customer Details",
+		"back": "Return to search results",
+		"modal": {
+			"confirmation": {
+				"delete": {
+					"title": "Delete device?",
+					"subtitle": "This device will be deleted from the Knox Mobile Enrollment system.",
+					"key": "IMEI",
+					"buttons": {
+						"cancel": "Cancel",
+						"ok": "Delete"
+					}
+				},
+				"returned": {
+					"title": "Return device?",
+					"subtitle": "This device will be marked as returned in the Knox Mobile Enrollment system.",
+					"key": "IMEI",
+					"buttons": {
+						"cancel": "Cancel",
+						"ok": "Return"
+					}
+				}
+			}
+		},
+		"info": {
+			"field1": "Customer ID",
+			"field2": "Devices"
+		}
 	},
 	"newDevice": {
-		"title": "Submit new device"
+		"title": "Submit new device",
+		"back": "Return to dashboard",
+		"modal": {
+
+		}
 	},
 	"bulkDelete": {
-		"title": "Bulk delete"
+		"title": "Bulk delete",
+		"back": "Return to dashboard"
+	},
+	"reporting": {
+		"title": "Download report",
+		"back": "Return to dashboard"
 	},
 	"admin": {
 		"title": "Manage admins",
 		"search": {
 			"button": "Invite admin"
-		}
+		},
+		"back": "Return to previous page"
 	},
 	"uploader": {
 		"upload": {
@@ -51,17 +208,22 @@ const Lang = {
 			"cancel": "Cancel",
 			"submit": "Upload",
 			"modal": {
+				"progress": {
+					"pre": "Uploading..."
+				},
 				"success": {
 					"title": "Upload Successful",
-					"subtitle": "Note: You may want to document the Transaction ID for your records.",
-					"label": "Transaction ID:",
-					"labelStatus": "Status:"
+					"subtitle": "Note: You may want to document the Batch ID for your records.",
+					"label": "Batch ID:",
+					"labelStatus": "Status:",
+					"btnLabel": "OK"
 				},
 				"failure": {
 					"title": "Upload Failed",
 					"subtitle": "Please retry.",
-					"label": "Transaction ID:",
-					"labelStatus": "Status:"
+					"label": "Batch ID:",
+					"labelStatus": "Status:",
+					"btnLabel": "OK"
 				}
 			}
 		},
@@ -75,19 +237,38 @@ const Lang = {
 			"cancel": "Cancel",
 			"submit": "Upload",
 			"modal": {
+				"progress": {
+					"pre": "Uploading..."
+				},
 				"success": {
 					"title": "Upload Successful",
-					"subtitle": "Note: You may want to document the Transaction ID for your records.",
-					"label": "Transaction ID:",
-					"labelStatus": "Status:"
+					"subtitle": "Note: You may want to document the Batch ID for your records.",
+					"label": "Batch ID:",
+					"labelStatus": "Status:",
+					"btnLabel": "OK"
 				},
 				"failure": {
 					"title": "Upload Failed",
 					"subtitle": "Please retry.",
-					"label": "Transaction ID:",
-					"labelStatus": "Status:"
+					"label": "Batch ID:",
+					"labelStatus": "Status:",
+					"btnLabel": "OK"
 				}
 			}
+		}
+	},
+	"reportGenerator": {
+		"title": "Download Report",
+		"select": "Select the date range.",
+		"startDate": "Start date",
+		"endDate": "End date",
+		"btnLabel": "Download Report",
+		"generating": "Creating report...",
+		"generated": "Downloading report...",
+		"downloaded": {
+			"heading": "Download complete",
+			"message": "Check your downloads folder for the report file.",
+			"btnLabel": "OK"
 		}
 	},
 	"table": {
@@ -97,7 +278,14 @@ const Lang = {
 				"label": "View:",
 				"title": "Page Size"
 			}
+		},
+		"buttons": {
+			"delete": "Delete",
+			"return": "Return"
 		}
+	},
+	"errors": {
+		"network": "Server error"
 	}
 };
 

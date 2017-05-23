@@ -1,45 +1,39 @@
 import React from 'react';
 import {Dropdown, DropdownMenu, DropdownItem} from 'reactstrap';
-import {Redirect} from 'react-router-dom';
 import FA from 'react-fontawesome';
 
 import {Lang, session} from '../shared';
 import {logo} from '../images';
 
+const lang = Lang.header;
+
 export default React.createClass({
 	getInitialState() {
+		const {user} = session.isAuthenticated();
 		return {
 			dropdownOpen: false,
-			user: "g.stalin@samsung.com",
-			logout: false,
-			next: null
+			user: user.name
 		};
 	},
 	render() {
-		if (this.state.logout) {
-			return (
-				<Redirect to="/"/>
-			);
-		}
-		if (this.state.next) {
-			return (
-				<Redirect to={this.state.next}/>
-			);
-		}
 		let title, animateClass = '';
 		if (this.props.logo) {
 			title = (
 				<div className="col-md-8 col-12 text-center text-md-left">
-					<img src={logo} className="header-logo mr-2 mr-lg-4" alt=""/>
-					<span className="text-muted font-weight-bold d-inline-block">{Lang.title}</span>
+					<div className="d-inline-block cursor" onClick={() => this.goTo("/dashboard")}>
+						<img src={logo} className="header-logo mr-2 mr-lg-4" alt=""/>
+						<span className="text-muted font-weight-bold d-inline-block">{Lang.title}</span>
+					</div>
 				</div>
 			)
 		}
 		else if (this.props.title) {
 			title = (
 				<div className="col-md-8 col-12 text-center text-md-left">
-					<img src={logo} className="header-logo mr-2 mr-lg-4" alt=""/>
-					<span className="text-muted font-weight-bold d-inline-block">{this.props.title}</span>
+					<div className="d-inline-block cursor" onClick={() => this.goTo("/dashboard")}>
+						<img src={logo} className="header-logo mr-2 mr-lg-4" alt=""/>
+						<span className="text-muted font-weight-bold d-inline-block">{this.props.title}</span>
+					</div>
 				</div>
 			)
 		}
@@ -69,14 +63,11 @@ export default React.createClass({
 								</div>
 
 								<DropdownMenu className="header-popup">
-									<DropdownItem onClick={() => this.setState({next: '/admin/manage'})}>
-										Manage Admins
+									<DropdownItem onClick={() => this.goTo("/admin/manage")}>
+										{lang.links.admin}
 									</DropdownItem>
-									<DropdownItem onClick={() => {
-										session.logout();
-										this.setState({logout: true})
-									}}>
-										Logout
+									<DropdownItem onClick={this.logout}>
+										{lang.links.logout}
 									</DropdownItem>
 								</DropdownMenu>
 							</Dropdown>
@@ -86,6 +77,15 @@ export default React.createClass({
 				</div>
 			</div>
 		);
+	},
+	goTo(link) {
+		if (this.props.history.location.pathname !== link) {
+			this.props.history.push(link);
+		}
+	},
+	logout() {
+		session.logout();
+		this.props.history.replace("/");
 	},
 	toggle() {
 		this.setState({

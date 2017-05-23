@@ -1,21 +1,30 @@
 import Login from './Login';
 import Forgot from './Forgot';
-import Dashboard from './Dashboard';
+import Batches from './Batches';
+import BatchDetails from './BatchDetails';
 import NewDevice from './NewDevice';
 import BulkDelete from './BulkDelete';
 import Transactions from './Transactions';
-import Devices from './Devices';
+import Customers from './Customers';
+import TransactionDetails from './TransactionDetails';
+import CustomerDetails from './CustomerDetails';
 import Authenticated from './Authenticated';
 import Admin from './Admins';
+import Reporting from './Reporting';
+
 
 module.exports = {
 	Authenticated,
 	Login,
 	Forgot,
-	Dashboard,
+	Batches,
+	BatchDetails,
 	NewDevice,
 	BulkDelete,
 	Transactions,
-	Devices,
+	Customers,
+	TransactionDetails,
+	CustomerDetails,
+	Reporting,
 	Admin
 };

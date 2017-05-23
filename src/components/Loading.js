@@ -3,8 +3,10 @@ import {
 	FadingCircle
 } from 'better-react-spinkit';
 
+import {settings} from '../shared';
+
 export default (props) => {
-	const {size = 100, color = "#007AC2"} = props;
+	const {size = settings.loader.size, color = "#007AC2"} = props;
 	return (
 		<FadingCircle size={size} color={color} className="d-inline-block" />
 	)

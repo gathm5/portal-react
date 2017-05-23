@@ -45,10 +45,15 @@ export default React.createClass({
 		}
 
 		return (
-			<div className="admin bg-faded pb-4">
-				<Header logo animate/>
-				<PageTitle bg="bg-white drop-shadow" title={Lang.admin.title}/>
-				<div className="manage-admin container bg-white mt-4 py-3 drop-shadow animated fadeInUp">
+			<div className="admin bg-faded pb-4 transition-item transition-page">
+				<Header history={this.props.history} logo animate/>
+				<PageTitle title={Lang.admin.title} back={(
+					<a onClick={() => this.props.history.goBack()} className="text-primary btn-link cursor">
+						<FA name="chevron-left" className="text-primary"/> {Lang.admin.back}
+					</a>
+				)} animate/>
+
+				<div className="manage-admin container bg-white mt-4 py-3 drop-shadow animated fadeIn">
 					<div className="row pb-4">
 						<div className="col-md text-center text-md-left">
 							<div className="form-inline text-md-center d-inline-block">

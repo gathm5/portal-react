@@ -2,7 +2,9 @@ import React from 'react';
 import Lang from '../shared/Lang';
 import {Link} from 'react-router-dom';
 import {Button, Modal, ModalBody} from 'reactstrap';
+import DropZone from 'react-dropzone';
 import Loading from './Loading';
+
 
 let lang;
 export default React.createClass({
@@ -15,11 +17,14 @@ export default React.createClass({
 			lang,
 			file: null,
 			modal: false,
-			loading: false
+			loading: false,
+			uploadErrorBeforeSubmit: false
 		};
 	},
 	render() {
 		const lang = this.state.lang;
+		const enabled = this.props.file && this.props.file.name;
+		const submitBtnClass = enabled ? "btn-primary text-white" : "btn-info text-muted";
 		return (
 			<div className="text-left">
 				<p className="lead text-primary font-weight-bold">
@@ -31,34 +36,27 @@ export default React.createClass({
 				<p className="lead font-weight-bold">
 					{lang.formTitle}
 				</p>
-				<div>
-					<label className="btn btn-primary btn-file">
+				<div className="border-5 border-light">
+					<button className="btn btn-primary rounded-left-only" onClick={() => this.uploadRef.open()}>
 						{lang.btnTitle}
-						<input
-							type="file"
-							hidden
-							onChange={(e) => this.setState({file: e.target.value})}
-							accept=".csv"
-						/>
-					</label>
-					<span className="ml-3 text-muted">
-						{this.state.file}
+					</button>
+
+					<span className="text-muted d-inline-block ml-3">
+						{this.props.file ? this.props.file.name : null}
 					</span>
+					<DropZone className="hidden" ref={(node) => this.uploadRef = node} onDrop={this.onDrop}
+							  accept=".csv" multiple={false}/>
 				</div>
-				<p className="text-primary">
-					{lang.formInfo}
-				</p>
-				<div className="text-right">
-					<Link to={this.props.back} className="btn btn-outline-danger mr-3">
+				<div className="text-right mt-4">
+					<Link to={this.props.back} className="btn btn-secondary text-muted mr-3">
 						{lang.cancel}
 					</Link>
-					<button type="button" className="btn btn-secondary text-muted" onClick={this.toggle}>
+					<button type="button" disabled={!enabled} className={`btn ${submitBtnClass}`}
+							onClick={this.props.upload}>
 						{lang.submit}
 					</button>
 				</div>
-
 				{this._buildModal()}
-
 			</div>
 		);
 	},
@@ -89,13 +87,26 @@ export default React.createClass({
 			)
 		}
 		return (
-			<Modal isOpen={this.state.modal} toggle={this.toggle} backdropClassName="opacity-20" modalClassName="mt-5">
+			<Modal isOpen={this.state.modal} toggle={this.toggle} backdropClassName="opacity-20"
+				   modalClassName="mt-5 mt-sm-0">
 				<ModalBody>
 					{content}
 				</ModalBody>
 			</Modal>
 		);
 	},
+
+	onDrop (accepted, rejected) {
+		if (accepted.length > 0) {
+			this.props.setFile(accepted[0]);
+		}
+		if (rejected.length > 0) {
+			this.setState({
+				uploadErrorBeforeSubmit: true
+			});
+		}
+	},
+
 	toggle() {
 		this.setState({
 			modal: !this.state.modal,
@@ -107,7 +118,7 @@ export default React.createClass({
 			});
 		}, 2000);
 	},
-	componentWillUpdate() {
+	componentWillUnmount() {
 		if (this.timer) {
 			clearTimeout(this.timer);
 		}

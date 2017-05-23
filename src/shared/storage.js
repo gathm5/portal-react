@@ -37,32 +37,32 @@ const helpers = {
 				reject(false);
 			}
 		});
+	},
+	clear(mode) {
+		mode.clear();
 	}
 };
 
+const fns = (type) => {
+	return {
+		get(key) {
+			return helpers.get(type, key);
+		},
+		set(key, value) {
+			return helpers.set(type, key, value);
+		},
+		remove(key) {
+			return helpers.remove(type, key);
+		},
+		clear() {
+			return helpers.clear(type);
+		}
+	};
+};
+
 const storage = {
-	session: {
-		get(key) {
-			return helpers.get(sessionStorage, key);
-		},
-		set(key, value) {
-			return helpers.set(sessionStorage, key, value);
-		},
-		remove(key) {
-			return helpers.remove(sessionStorage, key);
-		}
-	},
-	local: {
-		get(key) {
-			return helpers.get(localStorage, key);
-		},
-		set(key, value) {
-			return helpers.set(localStorage, key, value);
-		},
-		remove(key) {
-			return helpers.remove(localStorage, key);
-		}
-	}
+	session: fns(sessionStorage),
+	local: fns(localStorage)
 };
 
 export default storage;

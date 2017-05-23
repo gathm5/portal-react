@@ -1,9 +1,10 @@
 import moment from 'moment';
-const Settings = require("../Settings.json");
-const expireIn = Settings.session.expiration;
-const authKey = 'authentication';
+import Network from './network';
+const settings = require("./settings");
+const expireIn = settings.session.expiration;
+const authKey = `${settings.storage.prefix}authentication`;
 
-const storage = {
+const authStorage = {
 	set(key, value, expiration) {
 		let storageValue = {
 			value
@@ -45,23 +46,70 @@ const storage = {
 	},
 	remove(key) {
 		window.sessionStorage.removeItem(key);
+	},
+	clear() {
+		window.sessionStorage.clear();
 	}
 };
+
+const login = (data, resolve, that) => {
+	const expires = (data.expires) ? new Date(data.expires) : new Date().getTime() + expireIn;
+	authStorage.set(authKey, {
+		user: data.user,
+		token: data.token,
+		expires: data.expires
+	}, expires);
+	that.authenticated = true;
+	Network.setHeaders(settings.backend.header.name, data.token);
+	resolve();
+};
+
+/*const expireTime = (() => {
+ let date = new Date();
+ date.setHours(date.getHours() + 3);
+ return date;
+ })();
+ const fallbackData = {
+ user: {
+ name: "Gautham Stalin",
+ email: "gstalin@samsung.com"
+ },
+ token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI1OGVmZjVmMWM1MzllYzQwMTk1MjU4NjkiLCJuYW1lIjoiR2F1dGhhbSBTdGFsaW4iLCJlbWFpbCI6Imcuc3RhbGluQHNlYS5zYW1zdW5nLmNvbSIsImRldmljZXMiOltdLCJhZG1pbiI6dHJ1ZX0.RE9LkJgMpmTR2dgvUNhpbSDs0dOfWlic7kWYCrUun7c",
+ expires: expireTime
+ };*/
+
 const session = {
 	isAuthenticated() {
-		return !!storage.get(authKey);
+		const authData = authStorage.get(authKey);
+		if (authData) {
+			Network.setHeaders(settings.backend.header.name, authData.token)
+		}
+		return authData;
 	},
 	authenticate({email, password}) {
-		let date = new Date();
-		date.setTime(date.getTime() + expireIn);
-		storage.set(authKey, {
-			email,
-			password
-		}, date);
-		this.authenticated = true;
+		return new Promise((resolve, reject) => {
+			const authPath = `${settings.backend.endpoint}${settings.backend.preAuth.authenticate.endpoint}`;
+			const method = settings.backend.preAuth.authenticate.method;
+			Network[method](
+				authPath, {
+					email,
+					password
+				}
+			).then(({data}) => {
+				if (data.success) {
+					return login(data, resolve, this);
+				}
+				else {
+					reject(data.message);
+				}
+			}).catch((error) => {
+				reject(error);
+			});
+		});
 	},
 	logout() {
-		storage.remove(authKey);
+		authStorage.remove(authKey);
+		authStorage.clear();
 		this.authenticated = false;
 	}
 };

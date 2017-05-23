@@ -1,9 +1,8 @@
 import React from 'react';
-import moment from 'moment';
 import {Link} from 'react-router-dom';
-import Work from 'webworkify-webpack';
 import {
 	ButtonDropdown,
+	Dropdown,
 	DropdownToggle,
 	DropdownMenu,
 	DropdownItem,
@@ -12,61 +11,109 @@ import {
 	PaginationLink
 } from 'reactstrap';
 import FA from 'react-fontawesome';
+import _ from 'lodash';
 
-import {Lang, Configuration} from '../shared';
+import {Lang, settings, utilities} from '../shared';
+import Loading from './Loading';
+
+const lang = Lang.table;
 
 export default React.createClass({
 	getInitialState() {
-		const config = Configuration.pagination;
+		const config = settings.pagination;
 		return {
+			filteredRows: null,
 			rows: null,
 			sorted: null,
 			pageGroups: null,
-			pageSize: config.defaultPageSize,
+			pageSize: this.props.defaultPageSize || config.defaultPageSize,
 			pageNumber: 0,
 			hovered: -1,
 			dropdownOpen: false,
 			viewSizes: config.pageSizes,
-			minPageDisplay: config.minPageDisplay
+			minPageDisplay: config.minPageDisplay,
+			searchEnabled: this.props.search,
+			loading: true,
+			toolTipOpen: false,
+			filterDrop: {},
+			filterValues: {}
 		};
 	},
 
+	search() {
+
+	},
+	componentWillMount() {
+		this.search = _.debounce(this.search, 250);
+	},
+
 	componentDidMount() {
-		this.worker = Work(require.resolve('../worker/sort-list'));
 
-		this.worker.addEventListener('message', (event) => {
-			this.setState({
-				rows: event.data
-			});
-		}, false);
+		document.addEventListener("List Sorted", this.processList, false);
+		this.setState({
+			rows: this.props.rows,
+			loading: this.props.rows === null
+		});
+	},
 
-		if (this.props.defaultSort) {
-			this.sort({
-				type: "number",
-				field: "id",
-				direction: -1
-			});
-		}
-		else {
+
+	processList(e) {
+		this.setState({
+			rows: e.detail
+		});
+	},
+
+	componentWillReceiveProps(nextProps) {
+		if (this.state.rows !== nextProps.rows || this.props.head !== nextProps.head) {
 			this.setState({
-				rows: this.props.rows
+				rows: nextProps.rows,
+				loading: nextProps.rows === null
 			});
 		}
 	},
 
 	sort({type, field, direction}) {
-		this.worker.postMessage({
-			arr: this.props.rows,
-			type,
-			field,
-			direction
+		const createEvent = new window.CustomEvent("Sort List", {
+			detail: {
+				loading: false,
+				arr: this.props.rows,
+				type,
+				field,
+				direction
+			}
 		});
+		document.dispatchEvent(createEvent);
 	},
 
 	toggle() {
 		this.setState({
 			dropdownOpen: !this.state.dropdownOpen
 		});
+	},
+
+	closeFilter(which) {
+		const filterProp = this.state.filterDrop;
+		filterProp[which] = false;
+		this.setState({
+			filterDrop: filterProp
+		});
+	},
+
+	toggleFilter(which) {
+		const filterProp = this.state.filterDrop;
+		filterProp[which] = !this.state.filterDrop[which];
+		this.setState({
+			filterDrop: filterProp
+		});
+	},
+
+	clearFilter() {
+		this.filters = {};
+		this.setState({
+			filteredRows: null,
+			filterValues: {}
+		});
+		return true;
 	},
 
 	buildPagination(arr) {
@@ -122,16 +169,26 @@ export default React.createClass({
 	},
 
 	render() {
-		let content, pagination, viewSize;
-		if (this.state.rows) {
-			let rows = this.state.rows.slice(0), arrays = [];
+		let content, pagination, viewSize, className = this.props.className || "";
+		const contentRows = this.state.filteredRows || this.state.rows;
+		if (this.state.loading) {
+			content = (
+				<tr>
+					<td className="py-4 text-center" colSpan={this.props.head.length}>
+						<Loading />
+					</td>
+				</tr>
+			)
+		}
+		else if (contentRows && contentRows.length > 0) {
+			let rows = contentRows.slice(0), arrays = [];
 			while (rows.length > 0) {
 				arrays.push(rows.splice(0, this.state.pageSize));
 			}
 			if (arrays[this.state.pageNumber]) {
 				content = this.renderBody(arrays[this.state.pageNumber]);
 			}
-			if (this.state.rows.length >= 10) {
+			if (contentRows.length >= 10) {
 				pagination = (
 					<div className="d-inline-block">
 						{this.buildPagination(arrays)}
@@ -140,18 +197,28 @@ export default React.createClass({
 				viewSize = (
 					<ButtonDropdown className="btn-sm pr-0" isOpen={this.state.dropdownOpen} toggle={this.toggle}>
 						<DropdownToggle caret>
-							{Lang.table.pagination.dropdown.label} {this.state.pageSize}
+							{lang.pagination.dropdown.label} {this.state.pageSize}
 						</DropdownToggle>
 						<DropdownMenu right>
-							<DropdownItem header>{Lang.table.pagination.dropdown.title}</DropdownItem>
+							<DropdownItem header>{lang.pagination.dropdown.title}</DropdownItem>
 							{this.buildViewSizes(this.state.viewSizes)}
 						</DropdownMenu>
 					</ButtonDropdown>
 				)
 			}
 		}
+		else if (contentRows.length === 0) {
+			content = (
+				<tr>
+					<td className="py-4 text-center text-danger lead font-weight-bold"
+						colSpan={this.props.head.length}>
+						{lang.noRows}
+					</td>
+				</tr>
+			)
+		}
 		return (
-			<div className="table-responsive relative table-container">
+			<div className={`table-responsive relative table-container ${className}`}>
 				<div className="row no-gutters align-items-center">
 					{this.props.title ? (
 						<div className="col-12 col-sm text-center text-sm-left">
@@ -163,7 +230,7 @@ export default React.createClass({
 						{viewSize}
 					</div>
 				</div>
-				<table className="table table-striped table-bordered mt-1">
+				<table className="table table-striped table-bordered mt-1 table-fixed">
 					<thead>
 					<tr>
 						{this.renderHead(this.props.head)}
@@ -177,25 +244,98 @@ export default React.createClass({
 		);
 	},
 
+	componentWillUnmount() {
+		document.removeEventListener("List Sorted", this.processList, false);
+	},
+
+	filterSelect(key, value, isSelected) {
+		this.filters = this.filters || {};
+		this.filters[key] = this.filters[key] || {};
+		this.filters[key][value] = isSelected;
+		if (!isSelected) {
+			delete this.filters[key][value];
+		}
+		const filterArr = Object.keys(this.filters[key]);
+		const newRows = this.state.rows.filter((row) => {
+			if (filterArr.length < 1) {
+				return true;
+			}
+			else {
+				for (let i = 0; i < filterArr.length; i += 1) {
+					filterArr[i] = parseInt(filterArr[i], 10) || filterArr[i];
+					if (filterArr[i] === row[key]) {
+						return true;
+					}
+				}
+			}
+			return false;
+		});
+		this.setState({
+			filteredRows: newRows
+		});
+		return true;
+	},
+
+
 	renderHead(head) {
 		const {sorted} = this.state;
 		const {fieldMap} = this.props;
 		return head.map((_, key) => {
 			let iconClass = " fa-sort";
-			//console.log(sorted);
-			console.log("sorted executed!", fieldMap[_.name]);
 			if (sorted && sorted.column === fieldMap[_.name]) {
 				sorted.direction > 0 ? iconClass = " fa-sort-desc" : iconClass = " fa-sort-asc";
 			}
 			let sortIcon = _.sortable ?
-				<i style={{marginTop: '2px'}} className={`fa${iconClass} pull-right`} aria-hidden="true"/> : null;
+				<i style={{marginTop: '2px'}} className={`fa${iconClass} pull-right`}/> : null;
+
+			const cellBg = this.state.filterDrop[fieldMap[_.name]] ? "cell-light-bg" : "bg-primary";
+
 			return (
-				<th key={key} className="bg-primary text-white align-baseline text-center text-sm-left">
+				<th key={key} className={`text-white align-baseline text-center text-sm-left ${cellBg}`}>
 					{_.sortable ? (
 						<div className="cursor" onClick={() => this.handlePageClick(_.name, _.sortable)}>
 							{_.name}
 							{sortIcon}
 						</div>
+					) : _.filter ? (
+						<Dropdown isOpen={this.state.filterDrop[fieldMap[_.name]]}
+								  toggle={() => this.toggleFilter(fieldMap[_.name])}>
+							<span
+								className="cursor d-block"
+								onClick={() => this.toggleFilter(fieldMap[_.name])}
+								data-toggle="dropdown"
+								aria-haspopup="true"
+
+							>
+								{_.name}
+								<i style={{marginTop: '2px'}} className="fa fa-chevron-down pull-right"/>
+							</span>
+							<DropdownMenu className="table-filter-dropdown">
+								{
+									_.filter.map((field, key) => {
+										return (
+											<div key={key} className="px-2">
+												<label>
+													<input type="checkbox" checked={!!this.state.filterValues[field]}
+														   onClick={(e) => {
+															   const value = this.state.filterValues;
+															   value[field] = e.target.checked;
+															   this.setState(value);
+															   this.filterSelect(fieldMap[_.name], field, e.target.checked);
+															   this.toggleFilter(fieldMap[_.name]);
+														   }}/><span className="ml-2">{field}</span>
+												</label>
+											</div>
+										);
+									})
+								}
+								<DropdownItem divider/>
+								<div className="text-center text-primary cursor"
+									 onClick={() => this.clearFilter() && this.toggleFilter(fieldMap[_.name])}>Clear
+									filter
+								</div>
+							</DropdownMenu>
+						</Dropdown>
 					) : (
 						<div>
 							{_.name}
@@ -212,7 +352,7 @@ export default React.createClass({
 			return (
 				<tr>
 					<td colspan={4}>
-						{Lang.table.noRows}
+						{lang.noRows}
 					</td>
 				</tr>
 			);
@@ -220,20 +360,16 @@ export default React.createClass({
 		const {head, fieldMap, deleteBtn, returnBtn} = this.props, isHoverEnabled = deleteBtn || returnBtn;
 
 		return rows.map((_, key) => {
-
-			this.checkAndBuildFields(head, fieldMap, _, key);
-
 			return (
-				<tr key={key} onMouseEnter={() => isHoverEnabled && this.setState({hovered: key})}>
+				<tr key={key} className={isHoverEnabled ? "holder" : ""}>
 					{this.checkAndBuildFields(head, fieldMap, _, key)}
 				</tr>
 			);
 		});
 	},
 
-	handlePageClick(field, type) {
+	handlePageClick(field, type, direction = -1) {
 		const {sorted} = this.state, fields = this.props.fieldMap;
-		let direction = -1;
 		if (sorted && sorted.direction) {
 			direction *= sorted.direction;
 		}
@@ -255,7 +391,14 @@ export default React.createClass({
 			return (
 				<DropdownItem
 					key={key}
-					onClick={() => this.setState({pageSize: size})}
+					onClick={() => {
+						if (this.state.pageSize !== size) {
+							this.setState({
+								pageSize: size,
+								pageNumber: 0
+							});
+						}
+					}}
 				>
 					{size}
 				</DropdownItem>
@@ -263,30 +406,58 @@ export default React.createClass({
 		});
 	},
 
-	checkAndBuildFields(head, fields, row, key) {
+	checkAndBuildFields(head, fields, row) {
 		const isHoverEnabled = (this.props.deleteBtn || this.props.returnBtn);
-		let visibility;
 
-		this.state.hovered === key ? visibility = "" : visibility = " invisible";
+		let deleteBtn = (
+			<div className="btn-tooltip relative d-inline-block pull-right">
+				<button type="button" disabled
+						className={`btn btn-dark btn-sm show-on-hovered`}
+				>
+					{lang.buttons.delete}
+				</button>
+				<span className="btn-tooltip-text arrow_box">This record cannot be deleted</span>
+			</div>
+		), returnBtn = this.props.doNotShowReturn ? null : (
+			<div className="btn-tooltip relative d-inline-block pull-right">
+				<button type="button" disabled
+						className={`btn btn-dark btn-sm ml-2 show-on-hovered btn-tooltip`}
+				>
+					{lang.buttons.return}
+				</button>
+				<span className="btn-tooltip-text">This record cannot be returned</span>
+			</div>
+		);
 
-		const deleteBtn = (this.props.deleteBtn ? (
-			<div onClick={this.props.deleteBtn}
-				 className={`btn btn-danger btn-sm pull-right${visibility}`}
-			>
-				delete
-			</div>
-		) : null);
-		const returnBtn = (this.props.returnBtn ? (
-			<div onClick={this.props.returnBtn}
-				 className={`btn btn-danger btn-sm ml-2 pull-right${visibility}`}
-			>
-				return
-			</div>
-		) : null);
+		if ((this.props.deleteBtn && !this.props.deleteCondition)
+			|| (this.props.deleteCondition && this.props.deleteCondition.key && !!row[this.props.deleteCondition.key])) {
+			deleteBtn = (
+				<div className="btn-tooltip relative d-inline-block pull-right">
+					<button type="button" onClick={() => this.props.deleteBtn(row)}
+							className={`btn btn-dark btn-sm show-on-hovered`}
+					>
+						{lang.buttons.delete}
+					</button>
+				</div>
+			);
+		}
+
+		if ((this.props.returnBtn && !this.props.returnCondition)
+			|| (this.props.returnCondition && this.props.returnCondition.key && !!row[this.props.returnCondition.key])) {
+			returnBtn = (
+				<div className="btn-tooltip relative d-inline-block pull-right">
+					<button type="button" onClick={() => this.props.returnBtn(row)}
+							className={`btn btn-dark btn-sm ml-2 show-on-hovered`}
+					>
+						{lang.buttons.return}
+					</button>
+				</div>
+			);
+		}
 
 		return head.map((_, i) => {
-			let btns, innerContent = row[fields[_.name]];
-			if (i === 0 && isHoverEnabled) {
+			let btns, innerContent;
+			if (i === (head.length - 1) && isHoverEnabled) {
 				btns = (
 					<div className="col-12 text-left text-lg-right col-lg">
 						<div className="d-inline-block">
@@ -296,26 +467,77 @@ export default React.createClass({
 					</div>
 				);
 			}
-			if (i === 0) {
-				let link = row[fields[_.name]];
-				if (_.link && _.condition && row[_.condition.key] === _.condition.value) {
+			let link = row[fields[_.name]];
+			if (_.link && typeof _.link === 'string') {
+				if (_.condition) {
+					const conditionOutput = typeof _.condition.value === "object"
+						? _.condition.value.indexOf(row[fields[_.condition.key]].toLowerCase()) > -1
+						: row[fields[_.condition.key]].toLowerCase() === _.condition.value;
+
+					console.log(row[fields[_.condition.key]].toLowerCase());
+
+					if (conditionOutput) {
+						const linkAddress = _.link.indexOf(":id") > -1 ?
+							`/${_.link.replace(":id", row[fields[_.name]])}` : `/${_.link}${row[fields[_.name]]}`;
+
+						link = (
+							<Link to={linkAddress}>
+								{`${row[fields[_.name]]}`}
+							</Link>
+						);
+					}
+				}
+				else if (!_.condition) {
+					const linkAddress = _.link.indexOf(":id") > -1 ?
+						`/${_.link.replace(":id", row[fields[_.name]])}` : `/${_.link}${row[fields[_.name]]}`;
+
 					link = (
-						<Link to={`/${_.link}${row[fields[_.name]]}`}>
+						<Link to={linkAddress} className="text-primary btn-link cursor">
 							{`${row[fields[_.name]]}`}
 						</Link>
 					);
 				}
-				innerContent = (
-					<div className="row no-gutters">
-						<div className="col-12 col-lg">
-							{link}
-						</div>
-						{btns}
-					</div>
-				)
 			}
+			else if (_.link && typeof _.link === 'function') {
+				if (_.condition && typeof _.condition === "object") {
+
+					const conditionOutput = typeof _.condition.value === "object" ?
+						_.condition.value.indexOf(row[fields[_.condition.key]].toLowerCase()) > -1
+						: row[fields[_.condition.key]].toLowerCase() === _.condition.value;
+
+					if (conditionOutput) {
+						link = (
+							<a onClick={() => _.link(row)}
+							   className="text-primary btn-link cursor a">{row[fields[_.name]]}</a>
+						);
+					}
+				}
+				else if (_.condition && typeof _.condition === "function") {
+					const conditionOutput = _.condition(row);
+					if (conditionOutput) {
+						link = (
+							<a onClick={() => _.link(row)}
+							   className="text-primary btn-link cursor a">{row[fields[_.name]]}</a>
+						);
+					}
+				}
+				else if (!_.condition) {
+					link = (
+						<a onClick={() => _.link(row)}
+						   className="text-primary btn-link cursor a">{row[fields[_.name]]}</a>
+					);
+				}
+			}
+			innerContent = (
+				<div className="row align-items-center no-gutters">
+					<div className="col-12 col-lg">
+						{link}
+					</div>
+					{btns}
+				</div>
+			);
 			if (_.typecast === 'date') {
-				innerContent = moment(row[fields[_.name]]).format(" YYYY-MM-DD h:mm a");
+				innerContent = utilities.niceDate(row[fields[_.name]]);
 			}
 			return (
 				<td key={i}>

@@ -1,0 +1,20 @@
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 400;
+	src: url(/static/fonts/Roboto-Light.ttf);
+}
+
+@font-face {
+	font-family: 'Roboto Bold';
+	font-style: normal;
+	font-weight: 400;
+	src: url(/static/fonts/Roboto-Regular.ttf);
+}
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 400;
+	src: url(/static/fonts/OpenSans-Regular.ttf);
+}
