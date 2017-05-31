@@ -1,8 +1,8 @@
 import React from 'react';
-import {Header, Table, PageTitle, Loading} from '../components';
 import FA from 'react-fontawesome';
 import {Button, Modal, ModalBody} from 'reactstrap';
 
+import {Header, Table, PageTitle, Loading} from '../components';
 import {Lang, network} from '../shared';
 const lang = Lang["customer details"];
 const modalLang = lang.modal;

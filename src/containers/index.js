@@ -11,7 +11,7 @@ import CustomerDetails from './CustomerDetails';
 import Authenticated from './Authenticated';
 import Admin from './Admins';
 import Reporting from './Reporting';
-
+import Devices from './Devices';
 
 module.exports = {
 	Authenticated,
@@ -26,5 +26,6 @@ module.exports = {
 	TransactionDetails,
 	CustomerDetails,
 	Reporting,
-	Admin
+	Admin,
+	Devices
 };

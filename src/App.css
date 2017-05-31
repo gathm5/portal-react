@@ -6217,6 +6217,9 @@ html, body, #root {
 .table-fixing tr, .table-fixing td, .table-fixing th {
   display: block; }
 
+.dropdown {
+  z-index: 2; }
+
 .table-filter-dropdown {
   width: calc(100% + 13px);
   width: -webkit-calc(100% + 13px);
@@ -6251,3 +6254,10 @@ html, body, #root {
 
 .border-light {
   border: 1px solid #dddddd; }
+
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0; }
+
+input[type="number"] {
+  -moz-appearance: textfield; }

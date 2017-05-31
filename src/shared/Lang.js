@@ -29,7 +29,8 @@ const Lang = {
 		"dropdown": {
 			"options": [
 				"Transaction ID",
-				"Customer ID"
+				"Customer ID",
+				"IMEI"
 			],
 			"defaultOption": "Transaction ID"
 		}
@@ -175,6 +176,37 @@ const Lang = {
 			"field2": "Devices"
 		}
 	},
+	"devices": {
+		"table": {
+			"title": "Search by IMEI",
+			"previous": "Previous",
+			"next": "Next"
+		},
+		"back": "Return to dashboard",
+		"resultCount": "results",
+		"modal": {
+			"confirmation": {
+				"delete": {
+					"title": "Delete device?",
+					"subtitle": "This device will be deleted from the Knox Mobile Enrollment system.",
+					"key": "IMEI",
+					"buttons": {
+						"cancel": "Cancel",
+						"ok": "Delete"
+					}
+				},
+				"returned": {
+					"title": "Return device?",
+					"subtitle": "This device will be marked as returned in the Knox Mobile Enrollment system.",
+					"key": "IMEI",
+					"buttons": {
+						"cancel": "Cancel",
+						"ok": "Return"
+					}
+				}
+			}
+		}
+	},
 	"newDevice": {
 		"title": "Submit new device",
 		"back": "Return to dashboard",
@@ -216,6 +248,7 @@ const Lang = {
 					"subtitle": "Note: You may want to document the Batch ID for your records.",
 					"label": "Batch ID:",
 					"labelStatus": "Status:",
+					"errors": "Errors:",
 					"btnLabel": "OK"
 				},
 				"failure": {
@@ -223,6 +256,7 @@ const Lang = {
 					"subtitle": "Please retry.",
 					"label": "Batch ID:",
 					"labelStatus": "Status:",
+					"errors": "Errors:",
 					"btnLabel": "OK"
 				}
 			}
@@ -245,6 +279,7 @@ const Lang = {
 					"subtitle": "Note: You may want to document the Batch ID for your records.",
 					"label": "Batch ID:",
 					"labelStatus": "Status:",
+					"errors": "Errors:",
 					"btnLabel": "OK"
 				},
 				"failure": {
@@ -252,6 +287,7 @@ const Lang = {
 					"subtitle": "Please retry.",
 					"label": "Batch ID:",
 					"labelStatus": "Status:",
+					"errors": "Errors:",
 					"btnLabel": "OK"
 				}
 			}
@@ -265,6 +301,15 @@ const Lang = {
 		"btnLabel": "Download Report",
 		"generating": "Creating report...",
 		"generated": "Downloading report...",
+		"dropdown": {
+			"title": "Select report type",
+			"options": [
+				"Devices",
+				"Device Errors",
+				"Pre-processing Errors"
+			],
+			"defaultOption": "Devices"
+		},
 		"downloaded": {
 			"heading": "Download complete",
 			"message": "Check your downloads folder for the report file.",

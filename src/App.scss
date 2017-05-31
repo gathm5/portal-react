@@ -362,6 +362,10 @@ strong {
 	}
 }
 
+.dropdown {
+	z-index: 2;
+}
+
 .table-filter-dropdown {
 	$extra-width: 13px;
 	$extra-height: 4px;
@@ -407,4 +411,13 @@ strong {
 
 .border-light {
 	border: 1px solid #dddddd;
+}
+
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type="number"] {
+	-moz-appearance: textfield;
 }

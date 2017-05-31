@@ -51,7 +51,7 @@ const network = {
 	call(category, params, config) {
 		const TEMP_BLOCK = 200;
 		const setup = settings.backend.postAuth[category];
-		const prefix = settings.backend.underDevelopment && setup.isDev ? settings.backend.devApi : settings.backend.api;
+		const prefix = settings.backend.underDevelopment && setup.isDev ? settings.backend.devApi : setup.privilege ? settings.backend.privilegedApi : settings.backend.api;
 		const mapParams = (endpoint, params) => {
 			setup.param.map((param) => {
 				return endpoint = endpoint.replace(param, params[param.replace(":", "")]);
@@ -68,6 +68,7 @@ const network = {
 		}
 
 		const callEndpoint = `${prefix}${endpoint}${suffix}`;
+		console.log("callEndpoint:", prefix);
 		if (setup.cache && cacheReadyToRead) {
 			return new Promise((resolve, reject) => {
 				cacheHelpers.get(callEndpoint).then((data) => {

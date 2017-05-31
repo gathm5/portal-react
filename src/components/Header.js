@@ -12,7 +12,7 @@ export default React.createClass({
 		const {user} = session.isAuthenticated();
 		return {
 			dropdownOpen: false,
-			user: user.name
+			user
 		};
 	},
 	render() {
@@ -40,6 +40,11 @@ export default React.createClass({
 		if (this.props.animate) {
 			animateClass = " animated fadeInDown animated-delay";
 		}
+		const adminLink = this.state.user.privilege < 3 ? (
+			<DropdownItem onClick={() => this.goTo("/admin/manage")}>
+				{lang.links.admin}
+			</DropdownItem>
+		) : null;
 		return (
 			<div
 				className={`header jumbotron jumbotron-fluid bg-white p-3 mb-1 drop-shadow${animateClass}`}>
@@ -57,15 +62,13 @@ export default React.createClass({
 									aria-expanded={this.state.dropdownOpen}
 								>
 									<div>
-										{this.state.user}
+										{this.state.user.name}
 										<FA name="chevron-down" className="pl-2"/>
 									</div>
 								</div>
 
 								<DropdownMenu className="header-popup">
-									<DropdownItem onClick={() => this.goTo("/admin/manage")}>
-										{lang.links.admin}
-									</DropdownItem>
+									{adminLink}
 									<DropdownItem onClick={this.logout}>
 										{lang.links.logout}
 									</DropdownItem>

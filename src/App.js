@@ -19,7 +19,8 @@ import {
 	TransactionDetails,
 	CustomerDetails,
 	Reporting,
-	Admin
+	Admin,
+	Devices
 } from './containers';
 import {session, network, settings} from './shared';
 
@@ -82,6 +83,7 @@ class App extends Component {
 						<PrivateRoute exact path="/customers/:id" component={Customers}/>
 						<PrivateRoute path="/transactions/:id/details" component={TransactionDetails}/>
 						<PrivateRoute path="/customers/:id/details" component={CustomerDetails}/>
+						<PrivateRoute path="/devices/:id" component={Devices}/>
 						<PrivateRoute path="/admin/manage" component={Admin}/>
 					</Switch>
 				</div>

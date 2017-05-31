@@ -2,37 +2,43 @@ import React from 'react';
 import {Header, Table, PageTitle, Loading} from '../components';
 import FA from 'react-fontawesome';
 
-import {Lang, Data} from '../shared';
+import {Lang, network} from '../shared';
 
 export default React.createClass({
 	getInitialState() {
 		return {
-			rows: Data.admins,
+			rows: null,
 			next: false,
 			input: ""
 		};
 	},
+
+	componentDidMount() {
+		network.call("getUsers").then(({data}) => {
+			console.log(data);
+			this.setState({
+				rows: data.map((row) => {
+					row.status = row.isActive ? "Active" : "Inactive";
+					return row;
+				})
+			});
+		})
+	},
+
+
 	render() {
 		const head = [{
-			name: "First Name",
+			name: "Name",
 			sortable: true
 		}, {
-			name: "Last Name",
-			sortable: true
-		}, {
-			name: "Login ID",
-			sortable: true
-		}, {
-			name: "Phone",
+			name: "Email",
 			sortable: true
 		}, {
 			name: "Status",
 			sortable: true
 		}], fields = {
-			"First Name": "firstName",
-			"Last Name": "lastName",
-			"Login ID": "login",
-			"Phone": "phone",
+			"Name": "name",
+			"Email": "email",
 			"Status": "status"
 		};
 

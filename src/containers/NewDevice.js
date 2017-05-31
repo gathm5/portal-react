@@ -72,7 +72,8 @@ export default React.createClass({
 					else {
 						this.setState({
 							loading: false,
-							error: data
+							error: true,
+							data
 						})
 					}
 				})
@@ -112,6 +113,18 @@ export default React.createClass({
 						<span
 							className="font-weight-bold">{modalLang.success.labelStatus}</span> {this.state.data.status}
 					</div>
+					{
+						this.state.data.errors && this.state.data.errors.length > 0 ? (
+							<div>
+								<span
+									className="font-weight-bold">{modalLang.success.errors}</span> {
+								this.state.data.errors.map(
+									(err, key) =>
+										<span>{err}{this.state.data.errors.length - 1 !== key ? "," : ""}</span>
+								)}
+							</div>
+						) : null
+					}
 					<div className="text-right">
 						<Button color="primary" onClick={this.closeModal}>{modalLang.success.btnLabel}</Button>
 					</div>
@@ -122,18 +135,36 @@ export default React.createClass({
 						{modalLang.failure.title}
 					</p>
 					{
-						this.state.error.batchId ? (
+						this.state.data.batchId ? (
 							<div>
 								<span className="font-weight-bold">
 									{modalLang.failure.label}
-								</span> {this.state.error.batchId}
+								</span> {this.state.data.batchId}
 							</div>
 						) : null
 					}
-					<div>
-						<span
-							className="font-weight-bold">{modalLang.failure.labelStatus}</span> {this.state.error.status}
-					</div>
+					{
+						this.state.error.status ? (
+							<div>
+								<span className="font-weight-bold">
+									{modalLang.failure.labelStatus}
+								</span> {this.state.error.status}
+							</div>
+						) : null
+					}
+					{
+						this.state.data.errors && this.state.data.errors.length > 0 ? (
+							<div>
+								<span
+									className="font-weight-bold">{modalLang.failure.errors}</span> {
+								this.state.data.errors.map(
+									(err, key) =>
+										<span
+											key={key}>{err}{this.state.data.errors.length - 1 !== key ? "," : ""}<br/></span>
+								)}
+							</div>
+						) : null
+					}
 					<div className="text-right">
 						<Button color="primary" onClick={this.closeModal}>{modalLang.failure.btnLabel}</Button>
 					</div>

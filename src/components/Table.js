@@ -1,5 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
+
 import {
 	ButtonDropdown,
 	Dropdown,
@@ -168,8 +169,20 @@ export default React.createClass({
 		);
 	},
 
+	changePageManually(e, arrays) {
+		const newPage = Number(e.target.value);
+		if (!isNaN(newPage) && newPage > 0 && newPage < arrays.length) {
+			console.log(newPage, isNaN(newPage));
+			this.setState({
+				pageNumber: newPage - 1
+			});
+		}
+		e.preventDefault();
+		return false;
+	},
+
 	render() {
-		let content, pagination, viewSize, className = this.props.className || "";
+		let content, pagination, viewSize, pageBox, className = this.props.className || "";
 		const contentRows = this.state.filteredRows || this.state.rows;
 		if (this.state.loading) {
 			content = (
@@ -178,7 +191,7 @@ export default React.createClass({
 						<Loading />
 					</td>
 				</tr>
-			)
+			);
 		}
 		else if (contentRows && contentRows.length > 0) {
 			let rows = contentRows.slice(0), arrays = [];
@@ -227,6 +240,7 @@ export default React.createClass({
 					) : null}
 					<div className="col-12 col-sm text-center text-sm-right">
 						{pagination}
+						{pageBox}
 						{viewSize}
 					</div>
 				</div>
@@ -358,7 +372,6 @@ export default React.createClass({
 			);
 		}
 		const {head, fieldMap, deleteBtn, returnBtn} = this.props, isHoverEnabled = deleteBtn || returnBtn;
-
 		return rows.map((_, key) => {
 			return (
 				<tr key={key} className={isHoverEnabled ? "holder" : ""}>

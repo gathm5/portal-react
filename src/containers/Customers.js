@@ -113,6 +113,9 @@ export default React.createClass({
 		if (type === "Transaction ID") {
 			return this.props.history.push(`/transactions/${input}`)
 		}
+		else if (type === "IMEI") {
+			return this.props.history.push(`/devices/${input}`)
+		}
 		this.getData(input, () => this.props.history.replace(`/customers/${input}`));
 	}
 });

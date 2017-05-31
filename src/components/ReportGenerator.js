@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, ModalBody} from 'reactstrap';
+import {Dropdown, DropdownToggle, DropdownMenu, DropdownItem, Modal, ModalBody} from 'reactstrap';
 import DatePicker from 'react-bootstrap-date-picker';
 import moment from 'moment';
 import fileDownload from 'react-file-download';
@@ -21,7 +21,9 @@ export default React.createClass({
 			generated: false,
 			downloading: false,
 			disabled: true,
-			downloadLink: null
+			downloadLink: null,
+			selected: this.props.defaultOption || lang.dropdown.defaultOption,
+			dropdownOpen: false
 		};
 	},
 
@@ -43,7 +45,19 @@ export default React.createClass({
 				<p className="lead font-weight-bold text-primary">
 					{lang.title}
 				</p>
-				<p>
+				<p className="mb-2">
+					{lang.dropdown.title}
+				</p>
+				<Dropdown isOpen={this.state.dropdownOpen}
+						  toggle={() => this.setState({dropdownOpen: !this.state.dropdownOpen})} tether>
+					<DropdownToggle caret>
+						{this.state.selected}
+					</DropdownToggle>
+					<DropdownMenu>
+						{this._buildDrops()}
+					</DropdownMenu>
+				</Dropdown>
+				<p className="mt-4 mb-2">
 					{lang.select}
 				</p>
 				<div className="row">
@@ -72,6 +86,16 @@ export default React.createClass({
 				{this._buildModal()}
 			</div>
 		)
+	},
+
+	_buildDrops() {
+		return lang.dropdown.options.map((_, key) => {
+			return (
+				<DropdownItem onClick={() => this.setState({selected: _})} key={key}>
+					{_}
+				</DropdownItem>
+			);
+		});
 	},
 
 	handleDateChange: function (mode, value, formattedValue) {
@@ -151,20 +175,26 @@ export default React.createClass({
 	},
 
 	generateReport() {
-		console.log(new Date(this.state.startDate).toISOString(), new Date(this.state.endDate).toISOString());
 		this.setState({
 			generating: true,
 			generated: false,
 			isModalOpen: true
 		});
+
+		const mode = {
+			"Devices": "devicesReport",
+			"Device Errors": "deviceErrorsReport",
+			"Pre-processing Errors": "bouncedReport"
+		};
+
 		network
-			.call("generateReport", {
+			.call(mode[this.state.selected], {
 				start: new Date(this.state.startDate).getTime(),
 				end: new Date(this.state.endDate).getTime()
 			})
 			.then((data) => {
 				const {startDate, endDate} = this.state;
-				fileDownload(data, `KME-Report-${this.getSimpleDate(startDate)}-${this.getSimpleDate(endDate)}.csv`);
+				fileDownload(data, `KME-${this.state.selected.replace(/\s/g, "-")}-Report-${this.getSimpleDate(startDate)}-${this.getSimpleDate(endDate)}.csv`);
 				clearTimeout(this.timer);
 				this.timer = setTimeout(() => {
 					this.setState({

@@ -235,7 +235,17 @@ export default React.createClass({
 		if (!input) {
 			return;
 		}
-		type === "Transaction ID" ? this.props.history.push(`/transactions/${input}`)
-			: this.props.history.push(`/customers/${input}`)
+		let link;
+		switch (type) {
+			case "Customer ID":
+				link = `/customers/${input}`;
+				break;
+			case "IMEI":
+				link = `/devices/${input}`;
+				break;
+			default:
+				link = `/transactions/${input}`;
+		}
+		this.props.history.push(link);
 	}
 });

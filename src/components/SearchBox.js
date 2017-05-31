@@ -18,24 +18,17 @@ export default React.createClass({
 	render() {
 		return (
 			<div className="input-group search-box">
-				<Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle} tether
-						  onClick={(e) => e.preventDefault()}>
+				<Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle} tether>
 					<DropdownToggle
 						className="rounded-left rounded-left-only border-right-0 bg-info" caret>
 						{this.state.selected}
 					</DropdownToggle>
 					<DropdownMenu>
-						<DropdownItem
-							onClick={() => this.setState({selected: "Transaction ID"})}>
-							Transaction ID
-						</DropdownItem>
-						<DropdownItem onClick={() => this.setState({selected: "Customer ID"})}>
-							Customer ID
-						</DropdownItem>
+						{this._buildDrops()}
 					</DropdownMenu>
 				</Dropdown>
 
-				<input type="number" className="form-control rounded-right rounded-right-only z-0"
+				<input type="text" className="form-control rounded-right rounded-right-only z-0"
 					   value={this.state.input}
 					   onChange={(e) => this.setState({input: e.target.value})}
 					   onKeyPress={this.submit}/>

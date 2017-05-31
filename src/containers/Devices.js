@@ -3,18 +3,13 @@ import FA from 'react-fontawesome';
 import {Button, Modal, ModalBody} from 'reactstrap';
 
 import {Header, Table, SearchBox, Loading} from '../components';
-import {Lang, network, tempStore, utilities} from '../shared';
-
-const lang = Lang.transactions;
+import {Lang, network} from '../shared';
+const lang = Lang.devices;
 const modalLang = lang.modal;
-
 const TableSchema = {
 	head: [{
-		name: "Transaction ID",
-		sortable: "number",
-		condition: ({canClick = true}) => {
-			return canClick;
-		}
+		name: "IMEI",
+		sortable: "number"
 	}, {
 		name: "Customer ID",
 		sortable: "number",
@@ -25,36 +20,23 @@ const TableSchema = {
 	}, {
 		name: "Submitted",
 		sortable: "date",
-		typecast: 'date'
-	}, {
-		name: "Status",
-		sortable: false
+		typecast: "date"
 	}],
 	fields: {
-		"Transaction ID": "transactionId",
+		"IMEI": "deviceId",
 		"Customer ID": "customerId",
 		"Transaction Type": "type",
-		"Submitted": "submitted",
-		"Status": "status"
+		"Submitted": "submitted"
 	}
 };
-
 export default React.createClass({
 	getInitialState() {
-		TableSchema.head[0].link = (contentRow) => {
-			const item = this.state.rows.filter((row) => contentRow.transactionId === row.transactionId);
-			if (item && item.length > 0) {
-				tempStore.selected.transaction = item[0];
-			}
-			this.props.history.push(`/transactions/${contentRow.transactionId}/details`);
-		};
 		return {
 			rows: null,
-			isModalOpen: false,
 			current: null,
 			loading: true,
-			modalLoading: false,
-			error: null
+			error: null,
+			deviceId: this.props.match.params.id
 		};
 	},
 
@@ -62,31 +44,22 @@ export default React.createClass({
 		this.getData(this.props.match.params.id);
 	},
 
-	toggle() {
-		this.setState({
-			isModalOpen: !this.state.isModalOpen
-		});
-	},
-
-	getData(transactionId, callback) {
-		network
-			.call("transactions", transactionId)
-			.then(({data}) => {
-				const sortedData = utilities.sortArrayByDate(data, "submitted");
-				this.setState({
-					rows: sortedData,
-					loading: false,
-					error: null
-				});
-				if (callback) {
-					callback();
-				}
-			}, (error) => {
-				this.setState({
-					loading: false,
-					error
-				})
+	getData(deviceId, callback) {
+		network.call("imei", deviceId).then(({data}) => {
+			this.setState({
+				rows: data,
+				loading: false,
+				error: null
 			});
+			if (callback) {
+				callback();
+			}
+		}, (error) => {
+			this.setState({
+				loading: false,
+				error
+			})
+		});
 	},
 
 	render() {
@@ -98,7 +71,7 @@ export default React.createClass({
 
 		if (!this.state.loading && this.state.rows) {
 			content = (
-				<div className="transactions-list container bg-white py-3 animated fadeInRight">
+				<div className="customers-list container bg-white py-3 animated fadeInRight">
 					<p className="lead text-muted font-weight-bold">
 						{lang.table.title}
 					</p>
@@ -110,8 +83,9 @@ export default React.createClass({
 						head={TableSchema.head}
 						rows={this.state.rows}
 						deleteBtn={this.deleteItem}
-						deleteCondition={{key: "canDelete"}}
-						doNotShowReturn
+						deleteCondition={{key: "ownedBy"}}
+						returnBtn={this.returnItem}
+						returnCondition={{key: "ownedBy"}}
 					/>
 				</div>
 			);
@@ -126,7 +100,7 @@ export default React.createClass({
 		}
 
 		return (
-			<div className="transactions pb-4">
+			<div className="devices pb-4">
 				<Header history={this.props.history} logo animate/>
 				<div className="container">
 					<div className="row mt-3">
@@ -138,8 +112,8 @@ export default React.createClass({
 						<div className="col-12 col-md-8 text-center text-lg-left mt-2 mt-md-0">
 							<div className="form-inline text-md-center d-inline-block">
 								<div className="mb-2 mr-sm-2 mb-sm-0">
-									<SearchBox value={this.props.match.params.id}
-											   searchClicked={(input, h) => this.searchClicked(input, h)}/>
+									<SearchBox value={this.props.match.params.id} defaultOption="IMEI"
+											   searchClicked={this.searchClicked}/>
 								</div>
 							</div>
 						</div>
@@ -148,16 +122,21 @@ export default React.createClass({
 				<div className="container-fluid">
 					{content}
 				</div>
-				{this._buildModel()}
 			</div>
 		);
+	},
+
+	toggle() {
+		this.setState({
+			isModalOpen: !this.state.isModalOpen
+		});
 	},
 
 	_buildModel() {
 		if (!this.state.current) {
 			return null;
 		}
-		const {modalLoading} = this.state;
+		const {mode, modalLoading} = this.state;
 
 		const content = modalLoading ? (
 			<div className="text-center p-4">
@@ -166,18 +145,18 @@ export default React.createClass({
 		) : (
 			<div>
 				<p className="font-weight-bold lead">
-					{modalLang.confirmation.title}
+					{modalLang.confirmation[mode].title}
 				</p>
-				<span className="text-muted">{modalLang.confirmation.subtitle}</span>
+				<span className="text-muted">{modalLang.confirmation[mode].subtitle}</span>
 				<div>
 							<span
-								className="font-weight-bold">{modalLang.confirmation.key}</span>: {this.state.current.transactionId}
+								className="font-weight-bold">{modalLang.confirmation[mode].key}</span>: {this.state.current.imei}
 				</div>
 				<div className="text-right mt-2">
 					<Button color="info" size="sm" className="text-muted mr-2"
-							onClick={this.toggle}>{modalLang.confirmation.buttons.cancel}</Button>
+							onClick={this.toggle}>{modalLang.confirmation[mode].buttons.cancel}</Button>
 					<Button color="primary" size="sm"
-							onClick={this.confirmAction}>{modalLang.confirmation.buttons.ok}</Button>
+							onClick={() => this.confirmAction(this.state.mode)}>{modalLang.confirmation[mode].buttons.ok}</Button>
 				</div>
 			</div>
 		);
@@ -191,24 +170,25 @@ export default React.createClass({
 		)
 	},
 
-	confirmAction() {
-		const {current} = this.state;
+	confirmAction(type) {
+		const {customerId, current} = this.state;
 		const sendData = {
-			type: "Delete",
-			transactionId: current.transactionId,
-			customerId: current.customerId
+			customerId,
+			type,
+			deviceId: current.imei
 		};
 		this.setState({
 			modalLoading: true
 		});
 		network
-			.call("deleteTransaction", sendData)
+			.call(`${type}Device`, sendData)
 			.then(() => {
 				this.setState({
 					isModalOpen: false,
-					modalLoading: false
+					modalLoading: false,
+					loading: true
 				});
-				this.getData(this.props.match.params.id);
+				this.timer = setTimeout(() => this.getData(this.state.deviceId));
 			}, () => {
 				this.setState({
 					isModalOpen: false,
@@ -217,10 +197,19 @@ export default React.createClass({
 			});
 	},
 
-	deleteItem(transaction) {
+	deleteItem(device) {
 		this.setState({
-			isModalOpen: true,
-			current: transaction
+			mode: "delete",
+			current: device,
+			isModalOpen: true
+		});
+	},
+
+	returnItem(device) {
+		this.setState({
+			mode: "returned",
+			current: device,
+			isModalOpen: true
 		});
 	},
 
@@ -228,12 +217,12 @@ export default React.createClass({
 		if (!input) {
 			return null;
 		}
-		if (type === "Customer ID") {
+		if (type === "Transaction ID") {
+			return this.props.history.push(`/transactions/${input}`)
+		}
+		else if (type === "Customer ID") {
 			return this.props.history.push(`/customers/${input}`)
 		}
-		else if (type === "IMEI") {
-			return this.props.history.push(`/devices/${input}`)
-		}
-		this.getData(input, () => this.props.history.replace(`/transactions/${input}`));
+		this.getData(input, () => this.props.history.replace(`/devices/${input}`));
 	}
 });

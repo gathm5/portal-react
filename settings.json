@@ -21,6 +21,7 @@
 		"authenticate": "/authenticate",
 		"api": "/api",
 		"devApi": "/fakeApi",
+		"privilegedApi": "/admin",
 		"preAuth": {
 			"authenticate": {
 				"endpoint": "/authenticate",
@@ -80,6 +81,13 @@
 				"endpoint": "/all-devices?customerId=:customerId",
 				"param": ":customerId"
 			},
+			"imei": {
+				"isDev": false,
+				"method": "get",
+				"cache": true,
+				"endpoint": "/devices/:deviceId",
+				"param": ":deviceId"
+			},
 			"bulkAdd": {
 				"isDev": false,
 				"method": "post",
@@ -115,16 +123,46 @@
 				"endpoint": "/transaction/delete",
 				"refresh": true
 			},
-			"generateReport": {
+			"devicesReport": {
 				"isDev": false,
 				"method": "get",
 				"cache": false,
-				"endpoint": "/download-report?start=:start&end=:end",
+				"endpoint": "/report/devices?start=:start&end=:end",
 				"refresh": false,
 				"param": [
 					":start",
 					":end"
 				]
+			},
+			"deviceErrorsReport": {
+				"isDev": false,
+				"method": "get",
+				"cache": false,
+				"endpoint": "/report/deviceErrors?start=:start&end=:end",
+				"refresh": false,
+				"param": [
+					":start",
+					":end"
+				]
+			},
+			"bouncedReport": {
+				"isDev": false,
+				"method": "get",
+				"cache": false,
+				"endpoint": "/report/bounced?start=:start&end=:end",
+				"refresh": false,
+				"param": [
+					":start",
+					":end"
+				]
+			},
+			"getUsers": {
+				"isDev": false,
+				"method": "get",
+				"cache": true,
+				"endpoint": "/getAllUsers",
+				"refresh": false,
+				"privilege": 2
 			}
 		}
 	},
