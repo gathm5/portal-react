@@ -14,7 +14,7 @@ case "$choice" in
 
         # Setting date and version code in the index.html file
         echo "\n<!-- Last update on $DATE -->" >> build/index.html
-        echo "<!-- Version: 1.$(($value/10)) -->" >> build/index.html
+        echo "<!-- Version: 2.$(($value/10)) -->" >> build/index.html
         echo "file version updated"
         ;;
     *)

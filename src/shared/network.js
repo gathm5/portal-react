@@ -24,16 +24,6 @@ const cacheHelpers = {
 	}
 };
 
-const clearCache = () => {
-	storage.session.get(`${storagePrefix}authentication`).then(data => {
-		if (data) {
-			storage.session.clear();
-			storage.session.set(`${storagePrefix}authentication`, data);
-		}
-	}, () => {
-	});
-};
-
 const network = {
 	config(baseURL, timeout) {
 		baseURL = isLocal ? "" : baseURL;
@@ -45,8 +35,6 @@ const network = {
 	},
 	setHeaders(access, token) {
 		instance && (instance.defaults.headers.common[access] = token);
-		clearInterval(this.cacheTimer);
-		this.cacheTimer = setInterval(clearCache, 1000 * 60 * 5);
 	},
 	call(category, params, config) {
 		const TEMP_BLOCK = 200;
@@ -68,7 +56,6 @@ const network = {
 		}
 
 		const callEndpoint = `${prefix}${endpoint}${suffix}`;
-		console.log("callEndpoint:", prefix);
 		if (setup.cache && cacheReadyToRead) {
 			return new Promise((resolve, reject) => {
 				cacheHelpers.get(callEndpoint).then((data) => {
@@ -99,7 +86,7 @@ const network = {
 		return new Promise((resolve, reject) => {
 			instance.post(`${endpoint}`, params, config)
 				.then(data => {
-					clearCache();
+					network.clearPartialCache();
 					resolve(data);
 				}, error => {
 					reject(error);
@@ -112,6 +99,15 @@ const network = {
 	},
 	delete() {
 
+	},
+	clearPartialCache() {
+		storage.session.get(`${storagePrefix}authentication`).then(data => {
+			if (data) {
+				storage.session.clear();
+				storage.session.set(`${storagePrefix}authentication`, data);
+			}
+		}, () => {
+		});
 	}
 };
 export default network;

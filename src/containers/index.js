@@ -12,6 +12,7 @@ import Authenticated from './Authenticated';
 import Admin from './Admins';
 import Reporting from './Reporting';
 import Devices from './Devices';
+import ActivateProfile from './ActivateProfile';
 
 module.exports = {
 	Authenticated,
@@ -27,5 +28,6 @@ module.exports = {
 	CustomerDetails,
 	Reporting,
 	Admin,
-	Devices
+	Devices,
+	ActivateProfile
 };

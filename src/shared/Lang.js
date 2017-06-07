@@ -25,6 +25,13 @@ const Lang = {
 		"signIn": "Sign in",
 		"processing": "Logging in..."
 	},
+	"activate": {
+		"title": "Update Your Password",
+		"old": "Current Password",
+		"new": "New Password",
+		"confirm": "Confirm Password",
+		"button": "Change Password"
+	},
 	"search": {
 		"dropdown": {
 			"options": [
@@ -227,7 +234,19 @@ const Lang = {
 		"search": {
 			"button": "Invite admin"
 		},
-		"back": "Return to previous page"
+		"back": "Return to previous page",
+		"modal": {
+			"confirmation": {
+				"delete": {
+					"title": "Delete user",
+					"subtitle": "Are you sure you wanted to delete this user?",
+					"buttons": {
+						"cancel": "Cancel",
+						"ok": "Delete"
+					}
+				}
+			}
+		}
 	},
 	"uploader": {
 		"upload": {

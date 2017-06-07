@@ -76,8 +76,7 @@ export default React.createClass({
 							data
 						})
 					}
-				})
-				.catch(error => console.log("err", error));
+				});
 		}
 	},
 

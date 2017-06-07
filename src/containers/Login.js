@@ -8,7 +8,6 @@ import {Loading} from '../components';
 export default React.createClass({
 	getInitialState() {
 		return {
-			redirectToHome: false,
 			email: '',
 			password: '',
 			emailError: false,
@@ -98,9 +97,13 @@ export default React.createClass({
 				password
 			})
 			.then(
-				() => this.props.history.replace("/dashboard"),
+				(response) => {
+					if (response.isActivated) {
+						return this.props.history.replace("/dashboard")
+					}
+					this.props.history.replace("/activate");
+				},
 				(error) => {
-					console.log(error);
 					if (typeof error === "object") {
 						error = "Some error occurred while connecting to the server"
 					}

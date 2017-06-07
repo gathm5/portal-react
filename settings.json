@@ -3,7 +3,8 @@
 		"expiration": 1800000
 	},
 	"storage": {
-		"prefix": "attkme."
+		"prefix": "attkme.",
+		"refresh": 240000
 	},
 	"backend": {
 		"localhost": false,
@@ -16,7 +17,7 @@
 		"header": {
 			"name": "X-ACCESS-TOKEN"
 		},
-		"timeout": 20000,
+		"timeout": 30000,
 		"cacheTimeout": 600000,
 		"authenticate": "/authenticate",
 		"api": "/api",
@@ -25,6 +26,11 @@
 		"preAuth": {
 			"authenticate": {
 				"endpoint": "/authenticate",
+				"method": "post",
+				"cache": false
+			},
+			"reset": {
+				"endpoint": "/resetPassword",
 				"method": "post",
 				"cache": false
 			}
@@ -163,6 +169,29 @@
 				"endpoint": "/getAllUsers",
 				"refresh": false,
 				"privilege": 2
+			},
+			"addUser": {
+				"isDev": false,
+				"method": "post",
+				"cache": false,
+				"endpoint": "/addUser",
+				"refresh": true,
+				"privilege": 2
+			},
+			"deleteUser": {
+				"isDev": false,
+				"method": "post",
+				"cache": false,
+				"endpoint": "/removeUser",
+				"refresh": true,
+				"privilege": 2
+			},
+			"activateProfile": {
+				"isDev": false,
+				"method": "post",
+				"cache": false,
+				"endpoint": "/activate",
+				"refresh": false
 			}
 		}
 	},
@@ -177,6 +206,7 @@
 		"minPageDisplay": 10
 	},
 	"dateFormat": "YYYY-MM-DD h:mm a",
+	"showUTCDate": true,
 	"table": {
 		"batches": {
 			"defaultSort": "submitted"
@@ -187,5 +217,8 @@
 	},
 	"loader": {
 		"size": 75
+	},
+	"password": {
+		"strength": "strong"
 	}
 }

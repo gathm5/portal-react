@@ -1,6 +1,17 @@
 import React from 'react';
 
+import {session} from '../shared';
+
 export default React.createClass({
+	getInitialState() {
+		return {
+			email: "",
+			loading: false,
+			message: null,
+			error: null
+		};
+	},
+
 	render() {
 		return (
 			<div className="login fill container overflow-hidden">
@@ -12,7 +23,10 @@ export default React.createClass({
 							</h2>
 							<form onSubmit={this.onSubmit}>
 								<div className="form-group">
-									<input type="email" placeholder="Enter email address" className="form-control"/>
+									<input type="email" onChange={(e) => this.setState({email: e.target.value})}
+										   value={this.state.email}
+										   required
+										   placeholder="Enter email address" className="form-control"/>
 								</div>
 								<div className="text-right">
 									<button className="btn btn-secondary text-muted mr-3" type="button" onClick={() => {
@@ -23,6 +37,16 @@ export default React.createClass({
 									<button className="btn btn-primary" type="submit">Reset password</button>
 								</div>
 							</form>
+							{
+								this.state.message ? (
+									<div className="text-primary pt-2 text-center">{this.state.message}</div>
+								) : null
+							}
+							{
+								this.state.error ? (
+									<div className="text-danger pt-2 text-center">{this.state.error}</div>
+								) : null
+							}
 						</div>
 					</div>
 				</div>
@@ -31,5 +55,26 @@ export default React.createClass({
 	},
 	onSubmit(e) {
 		e.preventDefault();
+		this.setState({
+			message: null,
+			error: null,
+			loading: true
+		});
+		if (this.state.email) {
+			session.forgot(this.state.email).then(data => {
+				if (data.success) {
+					this.setState({
+						loading: false,
+						message: data.message || "Password reset. Please check your email for login instructions."
+					});
+				}
+				else {
+					this.setState({
+						loading: false,
+						error: data.message
+					});
+				}
+			})
+		}
 	}
 });

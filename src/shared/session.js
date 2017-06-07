@@ -61,22 +61,8 @@ const login = (data, resolve, that) => {
 	}, expires);
 	that.authenticated = true;
 	Network.setHeaders(settings.backend.header.name, data.token);
-	resolve();
+	resolve(data.user);
 };
-
-/*const expireTime = (() => {
- let date = new Date();
- date.setHours(date.getHours() + 3);
- return date;
- })();
- const fallbackData = {
- user: {
- name: "Gautham Stalin",
- email: "gstalin@samsung.com"
- },
- token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI1OGVmZjVmMWM1MzllYzQwMTk1MjU4NjkiLCJuYW1lIjoiR2F1dGhhbSBTdGFsaW4iLCJlbWFpbCI6Imcuc3RhbGluQHNlYS5zYW1zdW5nLmNvbSIsImRldmljZXMiOltdLCJhZG1pbiI6dHJ1ZX0.RE9LkJgMpmTR2dgvUNhpbSDs0dOfWlic7kWYCrUun7c",
- expires: expireTime
- };*/
 
 const session = {
 	isAuthenticated() {
@@ -107,10 +93,30 @@ const session = {
 			});
 		});
 	},
+	forgot(email) {
+		return new Promise((resolve, reject) => {
+			const authPath = `${settings.backend.endpoint}${settings.backend.preAuth.reset.endpoint}`;
+			const method = settings.backend.preAuth.reset.method;
+			Network[method](
+				authPath, {
+					email
+				}
+			).then(({data}) => {
+				resolve(data);
+			}, reject).catch((error) => {
+				reject(error);
+			});
+		});
+	},
 	logout() {
 		authStorage.remove(authKey);
 		authStorage.clear();
 		this.authenticated = false;
+	},
+	updateUser(user) {
+		const authData = authStorage.get(authKey);
+		authData.token = user.token;
+		authStorage.set(authKey, authData, authData.expires);
 	}
 };
 

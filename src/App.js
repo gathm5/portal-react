@@ -20,9 +20,20 @@ import {
 	CustomerDetails,
 	Reporting,
 	Admin,
-	Devices
+	Devices,
+	ActivateProfile
 } from './containers';
 import {session, network, settings} from './shared';
+
+let cacheTimer;
+
+const clearCacheWhenNeeded = () => {
+	cacheTimer = setTimeout(() => {
+		network.clearPartialCache();
+		clearTimeout(cacheTimer);
+		cacheTimer = clearCacheWhenNeeded();
+	}, settings.storage.refresh)
+};
 
 class App extends Component {
 	constructor(props) {
@@ -39,6 +50,7 @@ class App extends Component {
 		network.config(useAlternateEndpoint ? alternateEndpoint : endpoint, timeout);
 		if (this.state.authenticated) {
 			network.setHeaders(settings.backend.header.name, this.state.authenticated.token);
+
 		}
 	}
 
@@ -52,6 +64,8 @@ class App extends Component {
 			}
 		};
 		this.watchAuth();
+		clearTimeout(cacheTimer);
+		cacheTimer = clearCacheWhenNeeded();
 	}
 
 
@@ -65,7 +79,7 @@ class App extends Component {
 
 
 	renderView(isAuth) {
-		let home = isAuth ? "dashboard" : "login";
+		let home = isAuth ? (isAuth.user && isAuth.user.isActivated ? "dashboard" : "activate") : "login";
 		const supportsHistory = 'pushState' in window.history;
 		return (
 			<Router forceRefresh={!supportsHistory}>
@@ -74,6 +88,7 @@ class App extends Component {
 						<Route path="/login" component={Login}/>
 						<Redirect exact from="/" to={home}/>
 						<Route path="/forgot" component={Forgot}/>
+						<PrivateRoute path="/activate" component={ActivateProfile}/>
 						<PrivateRoute path="/dashboard" component={Batches}/>
 						<PrivateRoute path="/batch/:id/customer/:subId" component={BatchDetails}/>
 						<PrivateRoute path="/new" component={NewDevice}/>
@@ -97,6 +112,7 @@ class App extends Component {
 
 	removeWatchAuth = () => {
 		window.removeEventListener("focus", this.authListener, false);
+		clearTimeout(cacheTimer);
 	};
 }
 

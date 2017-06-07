@@ -7,7 +7,7 @@ import {
 	DropdownToggle,
 	DropdownMenu,
 	DropdownItem,
-	Pagination,
+	//Pagination,
 	PaginationItem,
 	PaginationLink
 } from 'reactstrap';
@@ -122,7 +122,7 @@ export default React.createClass({
 			return null;
 		}
 		const currentPageNum = this.state.pageNumber, maxDisplayCount = 4;
-		let displayCounter = 0;
+		let displayCounter = 0, pageBox;
 
 		const rows = [];
 
@@ -162,17 +162,42 @@ export default React.createClass({
 			))
 		}
 
+		pageBox = (
+			<ButtonDropdown className="btn-sm pr-0" isOpen={this.state.pageChoiceDropOpen} toggle={() => {
+				this.setState({
+					pageChoiceDropOpen: !this.state.pageChoiceDropOpen
+				})
+			}}>
+				<DropdownToggle caret>
+					Page {this.state.pageNumber + 1} of {arr.length}
+				</DropdownToggle>
+				<DropdownMenu right className="scrollable-menu">
+					{
+						arr.map((_, i) => (
+							<DropdownItem key={i} onClick={() => this.setState({pageNumber: i})}>
+								{i + 1}
+							</DropdownItem>
+						))
+					}
+				</DropdownMenu>
+			</ButtonDropdown>
+		);
+
 		return (
-			<Pagination className="mb-0">
-				{rows}
-			</Pagination>
+			<div className="d-inline-block">
+				{/*<div className="d-inline-block">
+					<Pagination className="mb-0">
+						{rows}
+					</Pagination>
+				</div>*/}
+				{pageBox}
+			</div>
 		);
 	},
 
 	changePageManually(e, arrays) {
 		const newPage = Number(e.target.value);
 		if (!isNaN(newPage) && newPage > 0 && newPage < arrays.length) {
-			console.log(newPage, isNaN(newPage));
 			this.setState({
 				pageNumber: newPage - 1
 			});
@@ -202,11 +227,7 @@ export default React.createClass({
 				content = this.renderBody(arrays[this.state.pageNumber]);
 			}
 			if (contentRows.length >= 10) {
-				pagination = (
-					<div className="d-inline-block">
-						{this.buildPagination(arrays)}
-					</div>
-				);
+				pagination = this.buildPagination(arrays);
 				viewSize = (
 					<ButtonDropdown className="btn-sm pr-0" isOpen={this.state.dropdownOpen} toggle={this.toggle}>
 						<DropdownToggle caret>
@@ -486,8 +507,6 @@ export default React.createClass({
 					const conditionOutput = typeof _.condition.value === "object"
 						? _.condition.value.indexOf(row[fields[_.condition.key]].toLowerCase()) > -1
 						: row[fields[_.condition.key]].toLowerCase() === _.condition.value;
-
-					console.log(row[fields[_.condition.key]].toLowerCase());
 
 					if (conditionOutput) {
 						const linkAddress = _.link.indexOf(":id") > -1 ?

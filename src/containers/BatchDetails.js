@@ -13,9 +13,11 @@ const TableSchema = {
 		name: "IMEI",
 		sortable: "number"
 	}, {
-		name: "Error Code"
+		name: "Error Code",
+		filter: null
 	}, {
-		name: "Error Detail"
+		name: "Error Detail",
+		filter: null
 	}],
 	fields: {
 		"IMEI": "imei",
@@ -78,6 +80,12 @@ export default React.createClass({
 		this.setState({
 			errorCount
 		});
+		if (errorGroups.length === 0) {
+			TableSchema.head[1].filter = null;
+			TableSchema.head[2].filter = null;
+			this.setState({});
+			return;
+		}
 		if (errorGroups.length > 0) {
 			const errorCodes = [], errorDetails = [];
 			errorGroups.map(({errorCode, errorDetail}) => {

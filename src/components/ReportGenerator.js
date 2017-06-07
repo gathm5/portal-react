@@ -23,7 +23,8 @@ export default React.createClass({
 			disabled: true,
 			downloadLink: null,
 			selected: this.props.defaultOption || lang.dropdown.defaultOption,
-			dropdownOpen: false
+			dropdownOpen: false,
+			error: null
 		};
 	},
 
@@ -128,7 +129,14 @@ export default React.createClass({
 
 	_buildModal() {
 		let content;
-		if (this.state.downloading) {
+		if (this.state.error) {
+			content = (
+				<p className="lead font-weight-bold">
+					{this.state.error}
+				</p>
+			)
+		}
+		else if (this.state.downloading) {
 			content = (
 				<div className="py-2">
 					<p className="lead font-weight-bold">
@@ -193,6 +201,13 @@ export default React.createClass({
 				end: new Date(this.state.endDate).getTime()
 			})
 			.then((data) => {
+				if (typeof data !== "string" && !data.success) {
+					this.setState({
+						error: data.message,
+						generated: false,
+						generating: false
+					});
+				}
 				const {startDate, endDate} = this.state;
 				fileDownload(data, `KME-${this.state.selected.replace(/\s/g, "-")}-Report-${this.getSimpleDate(startDate)}-${this.getSimpleDate(endDate)}.csv`);
 				clearTimeout(this.timer);

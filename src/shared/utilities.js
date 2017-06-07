@@ -7,6 +7,9 @@ const utilities = {
 	niceDate(date, replaceFormat) {
 		date = date || new Date();
 		const format = replaceFormat || settings.dateFormat;
+		if (settings.showUTCDate) {
+			return moment.utc(date).format(format);
+		}
 		return moment(date).format(format);
 	},
 	sortArrayByDate(arr, field, direction = 1) {

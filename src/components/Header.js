@@ -22,7 +22,7 @@ export default React.createClass({
 				<div className="col-md-8 col-12 text-center text-md-left">
 					<div className="d-inline-block cursor" onClick={() => this.goTo("/dashboard")}>
 						<img src={logo} className="header-logo mr-2 mr-lg-4" alt=""/>
-						<span className="text-muted font-weight-bold d-inline-block">{Lang.title}</span>
+						{/*<span className="text-muted font-weight-bold d-inline-block">{Lang.title}</span>*/}
 					</div>
 				</div>
 			)
@@ -32,7 +32,7 @@ export default React.createClass({
 				<div className="col-md-8 col-12 text-center text-md-left">
 					<div className="d-inline-block cursor" onClick={() => this.goTo("/dashboard")}>
 						<img src={logo} className="header-logo mr-2 mr-lg-4" alt=""/>
-						<span className="text-muted font-weight-bold d-inline-block">{this.props.title}</span>
+						{/*<span className="text-muted font-weight-bold d-inline-block">{this.props.title}</span>*/}
 					</div>
 				</div>
 			)
@@ -47,7 +47,7 @@ export default React.createClass({
 		) : null;
 		return (
 			<div
-				className={`header jumbotron jumbotron-fluid bg-white p-3 mb-1 drop-shadow${animateClass}`}>
+				className={`header jumbotron jumbotron-fluid bg-white p-1 p-sm-2 p-md-3 mb-1 drop-shadow${animateClass}`}>
 				<div className="container">
 					<div className="row">
 						{title}
