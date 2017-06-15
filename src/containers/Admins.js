@@ -47,6 +47,7 @@ export default React.createClass({
 				rows: data.map((row) => {
 					row.status = row.isActive ? "Active" : "Inactive";
 					row.canDelete = this.state.currentUser.email !== row.email;
+					row.role = row.privilege < 3 ? "Admin" : "User";
 					return row;
 				})
 			});
@@ -61,11 +62,15 @@ export default React.createClass({
 			name: "Email",
 			sortable: true
 		}, {
+			name: "Role",
+			sortable: true
+		}, {
 			name: "Status",
 			sortable: true
 		}], fields = {
 			"Name": "name",
 			"Email": "email",
+			"Role": "role",
 			"Status": "status"
 		};
 
@@ -215,7 +220,7 @@ export default React.createClass({
 			<Modal isOpen={this.state.isModalOpen} backdropClassName="opacity-20"
 				   modalClassName="mt-5 mt-sm-0" toggle={this.closeModal}>
 				<ModalHeader>
-					Invite New User
+					Invite User
 				</ModalHeader>
 				<ModalBody>
 					{content}

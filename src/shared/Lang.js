@@ -232,7 +232,7 @@ const Lang = {
 	"admin": {
 		"title": "Manage admins",
 		"search": {
-			"button": "Invite admin"
+			"button": "Invite user"
 		},
 		"back": "Return to previous page",
 		"modal": {
